@@ -48,16 +48,18 @@ class TestApp : public BaseApp
 		std::vector<std::vector<char>> m_field;
 		std::vector<Point> m_object;
 
+		std::vector<Point> m_pinObject;
+
 		int  m_activeSymbol;
 
 	public:
 		TestApp();
 		void ChangeFigure();
 		void ExecuteFigure();
-	//	void MoveFigure();
+		void MoveFigure();
 		void OutputField();
 		void AddObjectOnField();
-		void IncreasePositionX();
+		void IncreasePositionY();
 		void ClearField();
 
 		virtual void KeyPressed(int btnCode);

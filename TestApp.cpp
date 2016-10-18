@@ -34,11 +34,26 @@ TestApp::TestApp() : Parent(CNT_WIDTH, CNT_HEIGHT)
 
 void TestApp::AddObjectOnField()
 {
+	bool _isPin = false;
 	for (int i = 0; i < CNT_WIDTH; i++)
 	{
 		for (int j = 0; j < CNT_HEIGHT; j++)
 		{
-			m_field[i][j] = ' ';
+			for (int b = 0; b < m_pinObject.size(); b++)
+			{
+				if (m_pinObject[b].m_x == i && m_pinObject[b].m_y == j)
+				{
+					_isPin = true;
+
+					break;
+					break;
+				}
+			}
+			if (!_isPin)
+			{
+				m_field[i][j] = ' ';
+			}
+			_isPin = false;
 		}
 	}
 	for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
@@ -74,11 +89,29 @@ void TestApp::ChangeFigure()
 	}
 }
 
-void TestApp::IncreasePositionX()
+void TestApp::IncreasePositionY()
 {
-	for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
+	if (m_object[3].m_y != CNT_HEIGHT - 1 && m_field[m_object[3].m_x][m_object[3].m_y + 1] != 'X')
 	{
-		++m_object[i].m_y;
+		for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
+		{
+			++m_object[i].m_y;
+		}
+	}
+	else
+	{
+		for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
+		{
+			m_pinObject.push_back(m_object[i]);
+		}
+		m_object[0].m_x = CNT_WIDTH / 2;
+		m_object[1].m_x = CNT_WIDTH / 2 + 1;
+		m_object[2].m_x = CNT_WIDTH / 2 + 2;
+		m_object[3].m_x = CNT_WIDTH / 2 + 3;
+		for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
+		{
+			m_object[i].m_y = 0;
+		}
 	}
 }
 
@@ -140,6 +173,41 @@ void TestApp::ExecuteFigure()
 	}
 }
 
+void TestApp::MoveFigure()
+{
+	switch (m_stateMove)
+	{
+		case StateMove::MOVE_LEFT:
+		{
+			int _positionX = m_object[0].m_x;
+			if (_positionX)
+			{
+				for (int i = 0; i < m_object.size(); i++)
+				{
+					--m_object[i].m_x;
+				}
+			}
+	
+			break;
+		}
+		case StateMove::MOVE_RIGHT:
+		{
+			int _positionX = m_object[3].m_x;
+			if (_positionX != CNT_WIDTH)
+			{
+				for (int i = 0; i < m_object.size(); i++)
+				{
+					++m_object[i].m_x;
+				}
+			}
+
+			break;
+		}
+	default:
+		break;
+	}
+}
+
 void TestApp::KeyPressed(int btnCode)
 {
 	if (btnCode == 32)
@@ -150,61 +218,20 @@ void TestApp::KeyPressed(int btnCode)
 	else if (btnCode == 97)
 	{
 		m_stateMove = StateMove::MOVE_LEFT;
-//		MoveFigure();
+		MoveFigure();
 	}
 	else if (btnCode == 100)
 	{
 		m_stateMove = StateMove::MOVE_RIGHT;
-//		MoveFigure();
+		MoveFigure();
 	}
-
-	//if (btnCode == 119) //w
-	//	mObj1Y--;
-	//else if (btnCode == 115) //s
-	//	mObj1Y++;
-	//else if (btnCode == 97) //a
-	//	mObj1X--;
-	//else if (btnCode == 100) //d
-	//	mObj1X++;
-
-	//if (mObj1X < 0)
-	//	mObj1X = 0;
-	//else if (mObj1X >= X_SIZE)
-	//	mObj1X = X_SIZE - 1;
-
-	//if (mObj1Y < 0)
-	//	mObj1Y = 0;
-	//else if (mObj1Y >=Y_SIZE)
-	//	mObj1Y = Y_SIZE - 1;
 }
 
 void TestApp::UpdateF(float deltaTime)
 {
 	AddObjectOnField();
 	OutputField();
-	IncreasePositionX();
+	IncreasePositionY();
 
 	Sleep(500);
-
-	//SetChar(5, 5, L'X');
-
-	//mObj1XOld = mObj1X;
-	//mObj1YOld = mObj1Y;
-
-	////-----------------------------
-
-	//SetChar(mObj2X, mObj2Y, L' ');
-	//if (mDirection)
-	//{
-	//	mObj2X++;
-	//	if (mObj2X == 40)
-	//		mDirection = false;
-	//}
-	//else
-	//{
-	//	mObj2X--;
-	//	if (mObj2X == 10)
-	//		mDirection = true;
-	//}
-	//SetChar(mObj2X, mObj2Y, L'F');
 }

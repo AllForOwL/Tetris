@@ -1,19 +1,13 @@
 #include "TestApp.h"
 
-const int CNT_WIDTH		= 50;
-const int CNT_HEIGHT	= 50;
+const int CNT_WIDTH		= 20;
+const int CNT_HEIGHT	= 20;
 
 const int CNT_OBJECT_QUENTITY_COLS = 4;
 const int CNT_OBJECT_QUENTITY_ROWS = 4;
 
 TestApp::TestApp() : Parent(CNT_WIDTH, CNT_HEIGHT)
 {
-	mDirection = true;
-	mObj1XOld = mObj1X = 10;
-	mObj1YOld = mObj1Y = 10;
-	mObj2X = 10;
-	mObj2Y = 12;
-
 	m_stateObject = StateObject::STATE_HORISONTAL;
 
 	m_object.resize(CNT_OBJECT_QUENTITY_ROWS);
@@ -22,7 +16,7 @@ TestApp::TestApp() : Parent(CNT_WIDTH, CNT_HEIGHT)
 	m_object[2].m_x = CNT_WIDTH / 2 + 2;
 	m_object[3].m_x = CNT_WIDTH / 2 + 3;
 
-	m_field.resize(CNT_WIDTH, std::vector<char>(CNT_WIDTH));
+	m_field.resize(CNT_WIDTH, std::vector<char>(CNT_HEIGHT));
 	for (int i = 0; i < CNT_WIDTH; i++)
 	{
 		for (int j = 0; j < CNT_HEIGHT; j++)
@@ -56,9 +50,49 @@ void TestApp::AddObjectOnField()
 			_isPin = false;
 		}
 	}
-	for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
+	for (int b = 0; b < CNT_OBJECT_QUENTITY_ROWS; b++)
 	{
-		m_field[m_object[i].m_x][m_object[i].m_y] = 'X';
+		m_field[m_object[b].m_x][m_object[b].m_y] = 'X';
+	}
+}
+
+void TestApp::CheckFullLineX()
+{
+	int _quentityXInRows = 0;
+	for (int y = 0; y < CNT_HEIGHT; y++)
+	{
+		for (int x = 0; x < CNT_WIDTH; x++)
+		{
+			if (m_field[x][y] == 'X')
+			{
+				++_quentityXInRows;
+			}
+		}
+		if (_quentityXInRows == CNT_WIDTH)
+		{
+			for (int _x = 0; _x < CNT_WIDTH; _x++)
+			{
+				m_field[_x][y] = ' ';
+			}
+
+			for (int d = 0; d < m_pinObject.size(); d++)
+			{
+				if (m_pinObject[d].m_y == y)
+				{
+					m_pinObject.erase(m_pinObject.begin() + d);
+				}
+			}
+
+			for (int i = CNT_HEIGHT - 2; i > 0; i--)
+			{
+				for (int j = 0; j < CNT_WIDTH; j++)
+				{
+					m_field[i][j] = m_field[i - 1][j];
+				}
+			}
+		}
+
+		_quentityXInRows = 0;
 	}
 }
 
@@ -104,6 +138,7 @@ void TestApp::IncreasePositionY()
 		{
 			m_pinObject.push_back(m_object[i]);
 		}
+
 		m_object[0].m_x = CNT_WIDTH / 2;
 		m_object[1].m_x = CNT_WIDTH / 2 + 1;
 		m_object[2].m_x = CNT_WIDTH / 2 + 2;
@@ -112,6 +147,8 @@ void TestApp::IncreasePositionY()
 		{
 			m_object[i].m_y = 0;
 		}
+
+		CheckFullLineX();
 	}
 }
 
@@ -124,6 +161,12 @@ void TestApp::ExecuteFigure()
 		{
 			int _valueY = _positionOneElement.m_y + 1;
 			int _valueX = _positionOneElement.m_x - 2;
+
+			if (_valueX <= 0)
+			{
+				return;
+			}
+
 			for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
 			{
 				m_object[i].m_y = _valueY;
@@ -137,6 +180,12 @@ void TestApp::ExecuteFigure()
 		{
 			int _valueY = _positionOneElement.m_y - 2;
 			int _valueX = _positionOneElement.m_x + 1;
+
+			if (_valueY <= 0)
+			{
+				return;
+			}
+
 			for (int i = 0; i < CNT_OBJECT_QUENTITY_ROWS; i++)
 			{
 				m_object[i].m_y = _valueY;
@@ -150,6 +199,12 @@ void TestApp::ExecuteFigure()
 		{
 			int _valueY = _positionOneElement.m_y;
 			int _valueX = _positionOneElement.m_x;
+
+			if (_valueX <= 1)
+			{
+				return;
+			}
+
 			m_object[0].m_x = _valueX;
 			m_object[0].m_y = _valueY;
 
@@ -180,7 +235,7 @@ void TestApp::MoveFigure()
 		case StateMove::MOVE_LEFT:
 		{
 			int _positionX = m_object[0].m_x;
-			if (_positionX)
+			if (_positionX > 0)
 			{
 				for (int i = 0; i < m_object.size(); i++)
 				{
@@ -193,7 +248,7 @@ void TestApp::MoveFigure()
 		case StateMove::MOVE_RIGHT:
 		{
 			int _positionX = m_object[3].m_x;
-			if (_positionX != CNT_WIDTH)
+			if (_positionX != CNT_WIDTH-1)
 			{
 				for (int i = 0; i < m_object.size(); i++)
 				{
@@ -233,5 +288,5 @@ void TestApp::UpdateF(float deltaTime)
 	OutputField();
 	IncreasePositionY();
 
-	Sleep(500);
+	Sleep(400);
 }

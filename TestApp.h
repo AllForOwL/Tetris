@@ -9,16 +9,6 @@ class TestApp : public BaseApp
 	typedef BaseApp Parent;
 
 	private:
-		int mObj1XOld;
-		int mObj1YOld;
-		int mObj1X;
-		int mObj1Y;
-
-		int mObj2X;
-		int mObj2Y;
-
-		bool mDirection;
-
 		enum StateObject
 		{
 			STATE_HORISONTAL,
@@ -61,6 +51,7 @@ class TestApp : public BaseApp
 		void AddObjectOnField();
 		void IncreasePositionY();
 		void ClearField();
+		void CheckFullLineX();
 
 		virtual void KeyPressed(int btnCode);
 		virtual void UpdateF(float deltaTime);
